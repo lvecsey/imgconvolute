@@ -31,13 +31,13 @@ unsigned char getpixel(long int xpos, long int ypos, pixel_t *rgb, long int xres
 
       switch(pix) {
       case PIXEL_R:
-	sum += k[j*3+i] * (rgb[ (ypos+j) * xres + i ].r >> 8);
+	sum += k[j*3+i] * (rgb[ (ypos+j) * xres + xpos + i ].r / 256.0 - 128);
 	break;
       case PIXEL_G:
-	sum += k[j*3+i] * (rgb[ (ypos+j) * xres + i ].g >> 8);
+	sum += k[j*3+i] * (rgb[ (ypos+j) * xres + xpos + i ].g / 256.0 - 128);
 	break;
       case PIXEL_B:
-	sum += k[j*3+i] * (rgb[ (ypos+j) * xres + i ].b >> 8);
+	sum += k[j*3+i] * (rgb[ (ypos+j) * xres + xpos + i ].b / 256.0 - 128);
 	break;
       }
       
@@ -67,7 +67,7 @@ int main(int argc, char *argv[]) {
   
   long int n;
 
-  char *filename = argc>1 > argv[1] : NULL;
+  char *filename = argc>1 ? argv[1] : NULL;
 
   struct stat buf;
   
@@ -83,9 +83,9 @@ int main(int argc, char *argv[]) {
   for (yi = 0; yi < yh; yi++) {
     for (xi = 0; xi < xw; xi++) {
 
-      out1[yi*xw+xi] = getpixel(yi+1, xi+1, img.rgb, xres, PIXEL_R, kernel);
-      out2[yi*xw+xi] = getpixel(yi+1, xi+1, img.rgb, xres, PIXEL_G, kernel);
-      out3[yi*xw+xi] = getpixel(yi+1, xi+1, img.rgb, xres, PIXEL_B, kernel);          
+      out1[yi*xw+xi] = getpixel(xi, yi, img.rgb, xres, PIXEL_R, kernel);
+      out2[yi*xw+xi] = getpixel(xi, yi, img.rgb, xres, PIXEL_G, kernel);
+      out3[yi*xw+xi] = getpixel(xi, yi, img.rgb, xres, PIXEL_B, kernel);          
     }
   }
 
@@ -93,13 +93,13 @@ int main(int argc, char *argv[]) {
     mode_t mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
     int fd;
 
-    fd = open("out1.gray", O_CREAT | O_APPEND | O_WRONLY, mode);
+    fd = open("out1.gray", O_CREAT | O_WRONLY, mode);
     write(fd, out1, xw*yh);
 
-    fd = open("out2.gray", O_CREAT | O_APPEND | O_WRONLY, mode);
+    fd = open("out2.gray", O_CREAT | O_WRONLY, mode);
     write(fd, out2, xw*yh);
     
-    fd = open("out3.gray", O_CREAT | O_APPEND | O_WRONLY, mode);
+    fd = open("out3.gray", O_CREAT | O_WRONLY, mode);
     write(fd, out3, xw*yh);    
 
   }
