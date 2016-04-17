@@ -24,7 +24,7 @@ unsigned char getpixel(long int xpos, long int ypos, pixel_t *rgb, long int xres
 
   long int j,i;
 
-  long int sum = 0;
+  double sum = 0.0;
   
   for (j = 0; j < 3; j++) {
     for (i = 0; i < 3; i++) {
@@ -45,6 +45,8 @@ unsigned char getpixel(long int xpos, long int ypos, pixel_t *rgb, long int xres
   }
 
   sum /= 9;
+
+  sum *= 0.25;
   
   return sum;
   
